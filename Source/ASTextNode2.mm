@@ -671,23 +671,21 @@ static NSArray *DefaultLinkAttributeNames() {
   // Search the 9 points of a 44x44 square around the touch until we find a link.
   // Start from center, then do sides, then do top/bottom, then do corners.
   static constexpr CGSize kRectOffsets[9] = {
-    { 0, 0 },
-    { -22, 0 }, { 22, 0 },
-    { 0, -22 }, { 0, 22 },
-    { -22, -22 }, { -22, 22 },
-    { 22, -22 }, { 22, 22 }
+    { 0, 0 }
   };
 
   for (const CGSize &offset : kRectOffsets) {
     const CGPoint testPoint = CGPointMake(point.x + offset.width,
                                           point.y + offset.height);
-    ASTextPosition *pos = [layout closestPositionToPoint:testPoint];
-    if (!pos || !NSLocationInRange(pos.offset, clampedRange)) {
+//    ASTextPosition *pos = [layout closestPositionToPoint:testPoint];
+    ASTextRange *range = [layout textRangeAtPoint:testPoint];
+//    if (!pos || !NSLocationInRange(pos.offset, clampedRange)) {
+    if (range == nil) {
       continue;
     }
     for (NSString *attributeName in _linkAttributeNames) {
       NSRange effectiveRange = NSMakeRange(0, 0);
-      id value = [_attributedText attribute:attributeName atIndex:pos.offset
+      id value = [_attributedText attribute:attributeName atIndex:range.start.offset
                       longestEffectiveRange:&effectiveRange inRange:clampedRange];
       if (value == nil) {
         // Didn't find any links specified with this attribute.
